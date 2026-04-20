@@ -1,0 +1,30 @@
+# Scenarios Configuration for LiDAR Outlier Data Collection - SPECULAR ONLY
+# =========================================================
+
+# Baseline scenario: No outliers injected
+normal_operation_outlier:
+  params:
+    outlier_percentage: 0.0
+  duration: 1200
+  runs: 0
+
+# Low Outlier Percentage - Specular Only
+low_outlier_specular:
+  params:
+    outlier_percentage: 2.0
+  duration: 1200
+  runs: 4
+
+# Medium Outlier Percentage - Specular Only
+medium_outlier_specular:
+  params:
+    outlier_percentage: 4.0
+  duration: 1200
+  runs: 4
+
+# High Outlier Percentage - Specular Only
+high_outlier_specular:
+  params:
+    outlier_percentage: 6.0
+  duration: 1200
+  runs: 4
