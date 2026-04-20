@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Physics-Based Dropout Outlier Injection Launch File -->
+  <!-- Simulates dropout-based outliers only -->
+  
+  <!-- Dropout injection parameters -->
+  <arg name="dropout_mode" default="periodic" />
+  <arg name="dropout_interval" default="1" />
+  <arg name="dropout_duration" default="10" />
+  <arg name="per_ray_dropout_prob" default="1.0" />
+  <arg name="experiment_duration" default="300" />
+  <arg name="save_full_ranges" default="true" />
+  
+  <!-- Scenario and Run ID for data collection -->
+  <arg name="scenario_name" default="normal_operation_dropout" />
+  <arg name="run_id" default="1" />
+  <arg name="injector_save_dir" default="/home/talib/catkin_ws/Plot/dropout_analysis" doc="Directory for dataset_collector_dropout to save CSVs" />
+  
+    
+   <!-- Arguments -->
+  <arg name="map_yaml" default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/maps/map.yaml" />
+  <arg name="rviz" default="false" />
+  <arg name="gazebo_world" default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/worlds/willowgarage.world" />
+  <arg name="gazebo_gpu_lidar" default="false" />
+  <arg name="gazebo_visualize_lidar" default="false" />
+ 
+
+  <!-- GAZEBO SIMULATION -->
+  <include file="$(find stretch_gazebo)/launch/gazebo.launch">
+    <arg name="world" value="$(arg gazebo_world)" />
+    <arg name="visualize_lidar" value="$(arg gazebo_visualize_lidar)" />
+    <arg name="gpu_lidar" value="$(arg gazebo_gpu_lidar)" />
+    <arg name="gui" value="false" />
+   
+  
+  </include>
+  
+  
+  <!-- MAP SERVER -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_yaml)" />
+  
+  <!-- LOCALIZATION -->
+  <include file="$(find amcl)/examples/amcl_diff.launch">
+    <remap from="scan" to="/scan_anomalous" />
+  </include>
+  
+  <!-- DATASET COLLECTOR -->
+  <node name="dataset_collector_drif" pkg="stretch_navigation" type="dataset_collector_drift.py" output="screen">
+    <param name="experiment_duration" value="$(arg experiment_duration)" />
+    <param name="scenario_name" value="$(arg scenario_name)" />
+    <param name="run_id" value="$(arg run_id)" />
+    <param name="injector_save_dir" value="$(arg injector_save_dir)" />
+    <remap from="/fault_labels" to="/fault_labels"/>
+    <remap from="/scan" to="/scan_anomalous" />
+  </node>
+  
+  <!-- DROPOUT INJECTOR -->
+  <node name="enhanced_lidar_dropout_injector" pkg="stretch_navigation" type="enhanced_lidar_dropout_injector.py" output="screen">
+    <param name="dropout_mode" value="$(arg dropout_mode)" />
+    <param name="dropout_interval" value="$(arg dropout_interval)" />
+    <param name="dropout_duration" value="$(arg dropout_duration)" />
+    <param name="per_ray_dropout_prob" value="$(arg per_ray_dropout_prob)" />
+    <param name="experiment_duration" value="$(arg experiment_duration)" />
+    <param name="save_full_ranges" value="$(arg save_full_ranges)" />
+    <param name="injector_save_dir" value="$(arg injector_save_dir)" />
+  </node>
+  
+  <!-- NAVIGATION - Uses dropout outlier scan data -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find stretch_navigation)/config/common_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find stretch_navigation)/config/common_costmap_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find stretch_navigation)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find stretch_navigation)/config/global_costmap_params_withmap.yaml" command="load" />
+    <rosparam file="$(find stretch_navigation)/config/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find stretch_navigation)/config/recovery_behaviors.yaml" command="load" />
+    <remap from="/cmd_vel" to="/stretch_diff_drive_controller/cmd_vel" />
+    <remap from="/scan" to="/scan_anomalous" />
+    <remap from="/stretch_diff_drive_controller/odom" to="/stretch_diff_drive_controller/odom" />
+    <remap from="scan_filtered" to="scan" />
+  </node>
+  
+  <!-- AUTOMATIC NAVIGATION GOALS -->
+  <node name="robust_nav_goal" pkg="stretch_navigation" type="nav.py" output="screen">
+    <param name="map_yaml" value="$(arg map_yaml)" />
+  </node>
+
+  <!-- VISUALIZE -->
+  <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find stretch_navigation)/rviz/navigation.rviz" if="$(arg rviz)" />
+  
+  <!-- LAUNCH TERMINATOR -->
+  <node name="launch_terminator" pkg="stretch_navigation" type="launch_terminator.py" output="screen">
+    <param name="duration" value="$(arg experiment_duration)" />
+  </node>
+</launch>
