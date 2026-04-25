@@ -26,7 +26,9 @@ The full dataset is available on Zenodo:
 To run the simulation:
 1. Copy the relevant folders and files into `~/catkin_ws/src/stretch_ros/stretch_navigation`.
 2. Run the desired automation script for fault injection.
+  
 Note: All scripts currently use hardcoded paths. You must edit the file and map paths in each script to match your own package location.
+
 Example:
 cd ~/catkin_ws/src/stretch_ros/stretch_navigation/scripts
 python3 automate_data_collection_drift.py
