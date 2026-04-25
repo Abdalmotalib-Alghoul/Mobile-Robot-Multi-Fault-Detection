@@ -37,7 +37,7 @@ python3 automate_data_collection_drift.py
   author       = {Abdalmotalib Alghoul and Alessandro Freddi and Andrea Monteriu},
   title        = {Mobile Robot Low-Cost Sensors Multi-Fault Detection Experiment using Machine-Learning approach},
   year         = {2026},
-  howpublished = {\url{https://github.com/Abdalmotalib-Alghoul/Mobile-Robot-Multi-Fault-Detection}},
+  howpublished = {https://github.com/Abdalmotalib-Alghoul/Mobile-Robot-Multi-Fault-Detection},
   note         = {Full datasets available at Zenodo: https://zenodo.org/records/19672705}
 }
 
