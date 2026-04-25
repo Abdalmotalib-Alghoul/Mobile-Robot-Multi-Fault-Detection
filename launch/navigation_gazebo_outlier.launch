@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- Physics-Based Reflection Outlier Injection Launch File -->
-  <!-- Simulates reflection-based outliers only (no absorption outliers) -->
+  <!-- Physics-Based Beam Loos Injection Launch File -->
+
   
   <!-- Outlier injection parameters -->
   <arg name="outlier_percentage" default="10.0" />
@@ -19,7 +19,7 @@
   <!-- World and map files -->
   <arg name="gazebo_world" default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/worlds/willowgarage.world" />
   <arg name="map_yaml" default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/maps/map.yaml" />
-  <arg name="rviz" default="false" />
+  <arg name="rviz" default="true" />
   <arg name="gazebo_gpu_lidar" default="false" />
   <arg name="gazebo_visualize_lidar" default="false" />
   
@@ -29,7 +29,7 @@
     <arg name="world" value="$(arg gazebo_world)" />
     <arg name="visualize_lidar" value="$(arg gazebo_visualize_lidar)" />
     <arg name="gpu_lidar" value="$(arg gazebo_gpu_lidar)" />
-    <arg name="gui" value="false" />
+    <arg name="gui" value="true" />
    
   </include>
   

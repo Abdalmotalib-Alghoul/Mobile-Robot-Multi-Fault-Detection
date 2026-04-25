@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- Navigation Gazebo Drift Launch File - TF IMU Drift Injection - ENHANCED -->
-  <!-- Enhanced with shutdown coordination and robust process management -->
+  <!-- Navigation Gazebo Drift Launch File - TF IMU Drift Injection -->
+
   
   <arg name="navigation_goals" default="true" doc="whether to run automatic navigation goals" />
   
@@ -118,5 +118,5 @@
   </node>
 
   <!-- SHUTDOWN COORDINATION -->
-  <!-- All nodes now subscribe to /shutdown_signal for coordinated shutdown -->
+
 </launch>
