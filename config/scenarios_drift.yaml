@@ -1,0 +1,67 @@
+# Scenarios Configuration for LiDAR faults
+# =========================================================
+
+# Baseline scenario: No drift injected
+normal_operation_drift:
+  params:
+    distance_offset_m: 0.0
+    offset_rate_mps: 0.0
+    noise_std_m: 0.0
+  duration: 1200.0
+  runs: 0
+   
+# Low offset Scenario
+low_offset:
+  params:
+    distance_offset_m: 0.005
+    offset_rate_mps: 0.0
+    noise_std_m: 0.0
+  duration: 1200.0
+  runs: 0
+
+
+# Medium offset Scenario
+high_offset:
+  params:
+    distance_offset_m: 0.025
+    offset_rate_mps: 0.0
+    noise_std_m: 0.0
+  duration: 1200.0
+  runs: 0
+# High offset Scenario
+high1_offset:
+  params:
+    distance_offset_m: 0.2
+    offset_rate_mps: 0.0
+    noise_std_m: 0.0
+  duration: 1200.0
+  runs: 12
+
+
+  
+# Low noise Scenario
+low_noise:
+  params:
+    distance_offset_m: 0.0
+    offset_rate_mps: 0.0
+    noise_std_m: 0.005
+  duration: 1200.0
+  runs: 0
+  
+# medium noise Scenario
+medium_noise:
+  params:
+    distance_offset_m: 0.0
+    offset_rate_mps: 0.0
+    noise_std_m: 0.01
+  duration: 1200.0
+  runs: 0
+  
+# Heigh noise Scenario
+heigh_noise:
+  params:
+    distance_offset_m: 0.0
+    offset_rate_mps: 0.0
+    noise_std_m: 0.056
+  duration: 1200.0
+  runs: 0

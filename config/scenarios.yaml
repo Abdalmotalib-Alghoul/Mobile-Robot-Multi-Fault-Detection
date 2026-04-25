@@ -1,0 +1,44 @@
+# Scenarios Configuration for imu/pose 
+
+
+normal_operation:
+  params:
+    pose_x_offset: 0.0
+    acceleration_x_rate: 0.0
+    pose_ang_z_offset: 0.0
+    angular_velocity_z_rate: 0.0
+  duration: 1200 
+  runs: 10
+
+
+
+# === ACCELEROMETER DRIFT SCENARIOS ===
+
+
+acc_drift_light:
+  params:
+    pose_x_offset: 0.0
+    acceleration_x_rate: 0.00005   
+    pose_ang_z_offset: 0.0
+    angular_velocity_z_rate: 0.0
+  duration: 900
+  runs: 0
+
+acc_drift_moderate:
+  params:
+    pose_x_offset: 0.0
+    acceleration_x_rate: 0.00020  
+    pose_ang_z_offset: 0.0
+    angular_velocity_z_rate: 0.0
+  duration: 900
+  runs: 0
+
+acc_drift_heavy:
+  params:
+    pose_x_offset: 0.0
+    acceleration_x_rate: 0.000087   
+    pose_ang_z_offset: 0.0
+    angular_velocity_z_rate: 0.0
+  duration: 1200
+  runs: 10
+

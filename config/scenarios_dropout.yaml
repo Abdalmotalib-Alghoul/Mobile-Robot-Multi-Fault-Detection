@@ -1,0 +1,52 @@
+# Scenarios Configuration for LiDAR Dropout Data Collection
+# =========================================================
+
+# Baseline scenario: No dropout injected
+normal_operation_dropout:
+  params:
+    dropout_mode: none
+    dropout_interval: 0.0
+    dropout_duration: 0.0
+    per_ray_dropout_prob: 0.0
+  duration: 0.0
+  runs: 0
+
+# Low Dropout Scenario
+low_dropout:
+  params:
+    dropout_mode: periodic
+    dropout_interval: 1.0
+    dropout_duration: 5.0
+    per_ray_dropout_prob: 0.07
+  duration: 1200.0
+  runs: 5
+
+# Medium Dropout Scenario
+medium_dropout:
+  params:
+    dropout_mode: periodic
+    dropout_interval: 4.0
+    dropout_duration: 7.0
+    per_ray_dropout_prob: 0.10
+  duration: 1200.0
+  runs: 5
+
+# High Dropout Scenario
+high_dropout:
+  params:
+    dropout_mode: periodic
+    dropout_interval: 9.0
+    dropout_duration: 10.0
+    per_ray_dropout_prob: 0.10
+  duration: 1200.0
+  runs: 5
+
+# Full Dropout Scenario
+full_dropout:
+  params:
+    dropout_mode: periodic
+    dropout_interval: 10.0
+    dropout_duration: 5.0
+    per_ray_dropout_prob: 1.0
+  duration: 1200.0
+  runs: 5
