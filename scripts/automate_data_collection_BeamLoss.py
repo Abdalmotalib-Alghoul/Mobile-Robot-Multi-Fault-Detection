@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Automation Script for LiDAR dropout Data Collection 
+Automation Script for LiDAR beam loos Data Collection 
 """
 
 import subprocess
@@ -16,12 +16,12 @@ import glob
 import psutil
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Automate data collection for LiDAR dropout experiments.")
+    parser = argparse.ArgumentParser(description="Automate data collection for LiDAR outlier experiments.")
     parser.add_argument("--ros_workspace", type=str, default="/home/talib/catkin_ws", help="Path to the ROS workspace.")
-    parser.add_argument("--launch_file_path", type=str, default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/launch/navigation_gazebo_dropout.launch", help="Path to the roslaunch file.")
-    parser.add_argument("--save_base_dir", type=str, default="/home/talib/collected_datasets_dropout", help="Base directory to save collected datasets.")
-    parser.add_argument("--injector_save_dir", type=str, default="/home/talib/catkin_ws/Plot/dropout_analysis", help="Directory where dataset_collector_dropout saves its CSVs.")
-    parser.add_argument("--scenarios_file", type=str, default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/config/scenarios_dropout.yaml", help="Path to scenarios YAML configuration file.")
+    parser.add_argument("--launch_file_path", type=str, default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/launch/navigation_gazebo_outlier.launch", help="Path to the roslaunch file.")
+    parser.add_argument("--save_base_dir", type=str, default="/home/talib/collected_datasets_outlier", help="Base directory to save collected datasets.")
+    parser.add_argument("--injector_save_dir", type=str, default="/home/talib/catkin_ws/Plot/fault_analysis", help="Directory where dataset_collector_outlier saves its CSVs.")
+    parser.add_argument("--scenarios_file", type=str, default="/home/talib/catkin_ws/src/stretch_ros/stretch_navigation/config/scenarios_outlier.yaml", help="Path to scenarios YAML configuration file.")
     parser.add_argument("--gazebo_timeout", type=int, default=120, help="Timeout for Gazebo startup (seconds)")
     parser.add_argument("--skip_gazebo_check", action="store_true", help="Skip Gazebo ready check (use if Gazebo is slow)")
 
@@ -104,7 +104,7 @@ def force_kill_ros_gazebo():
     kill_patterns = [
         'gzclient', 'gzserver', 'gazebo',
         'move_base', 'amcl', 'map_server', 'rviz', 
-        'dataset_collector_dropout', 'enhanced_lidar_dropout_injector', 'launch_terminator',
+        'dataset_collector', 'outlier_injector', 'launch_terminator',
         'rosmaster', 'roscore', 'roslaunch'
     ]
     
@@ -376,9 +376,6 @@ def collect_and_move_files(scenario_name, run_id, injector_save_dir, save_base_d
         "*.csv"  # Last resort: any CSV file
     ]
     
-    
-    patterns.insert(0, f"dropout_dataset_{scenario_name}_run{run_id}*.csv")
-    
     found_files = {}
     for pattern in patterns:
         matching_files = glob.glob(os.path.join(injector_save_dir, pattern))
@@ -389,11 +386,11 @@ def collect_and_move_files(scenario_name, run_id, injector_save_dir, save_base_d
             
             # Check if file has reasonable size (not empty)
             if os.path.getsize(found_file) > 100:  # At least 100 bytes
-                found_files = {"dataset_dropout": found_file}
+                found_files = {"dataset_outlier": found_file}
                 print(f"Found data file for {scenario_name} (Run {run_id}): {os.path.basename(found_file)}")
                 
                 # Move to save directory
-                new_filename = f"dataset_dropout_{scenario_name}_run{run_id}_{current_timestamp}.csv"
+                new_filename = f"dataset_outlier_{scenario_name}_run{run_id}_{current_timestamp}.csv"
                 new_path = os.path.join(save_base_dir, new_filename)
                 os.rename(found_file, new_path)
                 print(f"  → Moved to: {new_filename}")
@@ -462,7 +459,7 @@ def main():
     
     for scenario_name, config in scenarios.items():
         runs = config.get("runs", 1)
-        duration = config.get("duration", 60)
+        duration = config.get("duration", 3500)
         params = config.get("params", {})
         
         print(f"\n=== Starting scenario: {scenario_name} ({runs} runs) ===")
@@ -492,8 +489,8 @@ def main():
             
             # Add delay between runs (skip after last run)
             if i < runs - 1:
-                print(f"⏳ Pausing for 3 minutes before next run... (Run {i+1}/{runs} of {scenario_name})")
-                time.sleep(30)  # 3 minutes
+                print(f"⏳ Pausing for 2 minutes before next run... (Run {i+1}/{runs} of {scenario_name})")
+                time.sleep(180)  # 2 minutes
 
     print(f"\n🎉 All simulations completed!")
     print(f"Successful runs: {successful_runs}/{total_runs}")
@@ -509,5 +506,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

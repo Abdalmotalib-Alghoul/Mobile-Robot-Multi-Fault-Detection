@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-FINAL ROBUST HIGH-QUALITY DATASET COLLECTOR FOR LIDAR & ODOMETRY FAULT DETECTION
+DATASET COLLECTOR FOR LIDAR & ODOMETRY FAULT DETECTION
 ================================================================================
-- Collects raw sensor data for offline feature extraction
+- Collects raw sensor data
 - Targets: odometry faults (/tf_anomalous) only
 - Saves 340 downsampled lidar beams from /scan + all key sensor fields
-- Includes ground truth, AMCL, particle stats for strong indirect signals
-- Robust: freshness checks, fallbacks, intermediate/final saves, progress logs
-- Professional: clean code, error handling, real-time safe
-- No engineered features (raw only) — perfect for your next-stage ML
+- Includes AMCL, particle stats for strong indirect signals
+- freshness checks, fallbacks, intermediate/final saves, progress logs
+- clean code, error handling
 """
 
 import rospy
@@ -217,7 +216,7 @@ class UnifiedFaultCollector:
             # Return None → skip row entirely
 
         if tf_pose is None:
-            return  # Critical: block row on failure
+            return 
 
         if not self.is_data_ready():
             return
@@ -229,7 +228,7 @@ class UnifiedFaultCollector:
             row['timestamp_ros'] = now.to_sec()
             row['wall_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-            # Downsampled LiDAR beams
+
             ds_ranges = self.downsample_ranges(self.get_sensor_ranges())
             for j in range(self.beam_count):
                 row[f'lidar_beam_{j:03d}'] = float(ds_ranges[j])

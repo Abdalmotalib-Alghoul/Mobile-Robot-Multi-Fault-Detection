@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-FINAL ROBUST HIGH-QUALITY DATASET COLLECTOR FOR LIDAR & ODOMETRY FAULT DETECTION
+ DATASET COLLECTOR FOR LIDAR & ODOMETRY FAULT DETECTION
 ================================================================================
 - Collects raw sensor data for offline feature extraction
 - Targets: odometry faults (/tf_anomalous) only
-- Saves 340 downsampled lidar beams from /scan + all key sensor fields
+- Saves downsampled lidar beams from /scan + all key sensor fields
 - Includes ground truth, AMCL, particle stats for strong indirect signals
-- Robust: freshness checks, fallbacks, intermediate/final saves, progress logs
-- Professional: clean code, error handling, real-time safe
-- No engineered features (raw only) — perfect for your next-stage ML
+-  freshness checks, fallbacks, intermediate/final saves, progress logs
+-clean code, error handling, real-time safe
+
 """
 
 import rospy
@@ -202,7 +202,7 @@ class UnifiedFaultCollector:
 
         current_time = time.time()
         
-        # Attempt TF lookup - only update timestamp on success
+        # Attempt TF lookup 
         tf_pose = None
         try:
             self.tf_listener.waitForTransform('odom', 'base_link', rospy.Time(0), rospy.Duration(0.1))
@@ -214,11 +214,10 @@ class UnifiedFaultCollector:
             self.last_stamps['tf_anomalous'] = rospy.Time.now()  # Only on success
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             rospy.logwarn_throttle(10, "TF lookup failed - skipping row")
-            # Return None → skip row entirely
+            # Return None 
 
         if tf_pose is None:
-            return  # Critical: block row on failure
-
+            return 
         if not self.is_data_ready():
             return
 
@@ -229,7 +228,7 @@ class UnifiedFaultCollector:
             row['timestamp_ros'] = now.to_sec()
             row['wall_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-            # Downsampled LiDAR beams
+
             ds_ranges = self.downsample_ranges(self.get_sensor_ranges())
             for j in range(self.beam_count):
                 row[f'lidar_beam_{j:03d}'] = float(ds_ranges[j])

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-Drift Injector - Distance Drift and Gaussian Noise (Cumulative)
+Drift Injector - Distance offset and Gaussian Noise (Cumulative)
 ===============================================================
 
-Simulates cumulative distance drift and Gaussian noise in LiDAR sensors using Backward Displacement Formula.
-Drift increases linearly over time. Noise is additive Gaussian. Saves dataset for analysis.
+Simulates cumulative distance offset and Gaussian noise in LiDAR sensors using .
 
-Author: Enhanced LiDAR Fault Injection System
 """
 
 import rospy

@@ -57,7 +57,7 @@ class TFDriftInjector:
 
         rospy.on_shutdown(self.shutdown_handler)
 
-        rospy.loginfo("TF Drift Injector Started (OPTIMIZED FOR 76 Hz TF)")
+        rospy.loginfo("TF Drift Injector Started")
         rospy.loginfo(f" Accel X rate: {self.acceleration_x_rate} m/s²")
         rospy.loginfo(f" Ang Z rate: {self.angular_velocity_z_rate} rad/s")
 
@@ -94,7 +94,7 @@ class TFDriftInjector:
         self.total_transforms_received += 1
         current_time_wall = time.time()
 
-        # Extract REAL timestamp from odom->base_link (if present)
+
         odom_stamp = None
         odom_transform_idx = None
         for i, transform in enumerate(msg.transforms):
@@ -104,13 +104,13 @@ class TFDriftInjector:
                 break
 
         if odom_stamp is None:
-            # No odom->base_link in this bundle → republish unchanged
+
             self.publish_simultaneously(msg)
             return
 
         current_time_ros = odom_stamp
 
-        # First odom->base_link → zero the timer exactly here
+
         if self.start_timestamp_ros is None:
             self.start_timestamp_wall = current_time_wall
             self.start_timestamp_ros = current_time_ros

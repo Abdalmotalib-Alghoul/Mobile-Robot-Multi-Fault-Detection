@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """
-Minimal LiDAR Dropout Injector - Behaves EXACTLY like enhanced_outlier_injector.py
-- No file saving
-- No in-memory data collection
-- Only injects dropout and publishes /scan_anomalous and /fault_labels
-- Uses periodic dropout events with per-ray probability
+ LiDAR Dropout Injector 
 """
 
 import rospy
@@ -17,10 +13,6 @@ from std_msgs.msg import String, Bool
 class MinimalLidarDropoutInjector:
     def __init__(self):
         rospy.init_node("enhanced_lidar_dropout_injector", anonymous=True)
-
-
-
-
 
 
         # Parameters
@@ -109,7 +101,7 @@ class MinimalLidarDropoutInjector:
         """Process scan and apply dropout if active"""
         current_time = rospy.Time.now().to_sec()
         if self.experiment_duration > 0 and (current_time - self.experiment_start_time) > self.experiment_duration:
-            return  # Silent exit after duration
+            return  
 
         # Check if dropout active
         dropout_active = False

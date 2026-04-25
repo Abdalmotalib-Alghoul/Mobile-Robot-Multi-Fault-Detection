@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Automation Script for LiDAR drift Data Collection - IMPROVED GAZEBO STARTUP
+Automation Script for LiDAR drift Data Collection 
 """
 
 import subprocess

@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
 """
-Robust Navigation Goal Node - Fast Transition Version
+Robot Autonomus Navigation Node 
 ====================================================
-
-Navigates the robot to randomized fixed goals with faster goal transitions.
-
-Optimizations:
-- Immediate goal cancellation upon success detection
-- Reduced waiting time between goals
-- More aggressive goal completion checking
-
-Author: Optimized Navigation System
 """
 
 import rospy
@@ -35,9 +26,9 @@ class RobustNavGoal:
         self.map_timeout = 10.0
         self.loop_duration = 36000.0
         
-        # OPTIMIZED: Faster goal timeout parameters
-        self.goal_timeout = 60.0  # Reduced from 120 to 60 seconds per goal
-        self.stuck_time_threshold = 5.0  # Reduced from 10 to 5 seconds without movement
+
+        self.goal_timeout = 60.0 
+        self.stuck_time_threshold = 5.0  
         self.success_wait_time = 0.5  # Wait only 0.5 seconds after success confirmation
         
         # Map variables

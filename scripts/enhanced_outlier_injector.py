@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LiDAR Physics-Based Crosstalk Outlier Injector - CONSECUTIVE BLOCKS VERSION (Indoor Robot Optimized)
+This script was initially developed to inject Cross-Talk faults. Later, it was modified to inject Beam Loss faults, so the terminology used here belongs to Cross-Talk. However, the core function injects Beam Loss. The terminology was not edited to avoid bugs and to allow reuse of the script for future Cross-Talk injection.
 """
 
 import rospy
@@ -14,14 +14,14 @@ class PhysicsBasedCrosstalkOutlierInjector:
     def __init__(self):
         rospy.init_node("enhanced_crosstalk_injector", anonymous=True)
         
-        # Parameters - CROSSTALK ONLY
+        # Parameters
         self.outlier_percentage = rospy.get_param("~outlier_percentage", 10.0)
         self.experiment_duration = rospy.get_param("~experiment_duration", 3500)
         self.sensor_max_range = rospy.get_param("~sensor_max_range", 12.0)
         self.sensor_min_range = rospy.get_param("~sensor_min_range", 0.15)
         
-        # Indoor-specific ghost parameters (short distances for nearby interfering robots)
-        self.ghost_min = rospy.get_param("~ghost_min_distance", 0.5)      # Close interferer (e.g., another robot nearby)
+        # Indoor-specific ghost parameters 
+        self.ghost_min = rospy.get_param("~ghost_min_distance", 0.5)      # Close interferer 
         self.ghost_max = rospy.get_param("~ghost_max_distance", 6.0)      # Typical indoor interference distance
         self.ghost_noise = rospy.get_param("~ghost_noise_std", 0.3)       # Small natural variation
         

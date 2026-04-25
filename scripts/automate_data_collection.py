@@ -1,17 +1,7 @@
 #!/usr/bin/env python3
 """
-Automation Script for TF Drift Data Collection - IMPROVED VERSION
+Automation Script for TF Drift Data Collection
 =========================================================
-
-Robust automation with proper process management, Gazebo validation, and cleanup.
-Based on the proven multipath ghost automation system.
-
-Optimizations:
-- Robust process management with tree killing
-- Gazebo startup validation with timeout
-- Proper system cleanup between runs
-- Shutdown signal coordination
-- File collection with validation
 """
 
 import subprocess
