@@ -1,38 +1,4 @@
 #!/usr/bin/env python3
-"""
-Unified XGBoost Training Script v8 - API COMPATIBILITY FIXES
-============================================================================
-For CoDIT 2026
-
-FIXES IN v8:
------------
-1. FIXED SHAP SAMPLE SIZE: Ensures minimum interpretability sample size.
-   When SHAP uses all available samples (small dataset), interpretability
-   functions still work with available data.
-
-2. FIXED PDP MULTICLASS: Added `target` parameter for multiclass classification.
-   PDP now correctly computes partial dependence for each class separately.
-
-3. FIXED LIME API: `as_pyplot_figure()` no longer accepts `ax` parameter.
-   Now creates figure separately and optionally adds to existing axes.
-
-4. FIXED SHAP WATERFALL: Modern SHAP API changed. Now uses `shap.Explanation`
-   object instead of passing `feature_names` directly to `waterfall()`.
-
-5. IMPROVED ERROR HANDLING: All plotting functions have better error handling
-   with specific warnings for API incompatibilities.
-
-KEY IMPROVEMENTS (from v7):
----------------------------
-- Stabilized sample matching for interpretability
-- Improved plot_local_shap_per_class with pre-computed SHAP values
-- Robust fallback when SHAP is disabled
-- Cleaner code with clear console output
-
-CLASS WEIGHT TUNING:
--------------------
-NORMAL_WEIGHT = 1.7 (default) - Adjust between 1.0-2.5 based on validation performance
-"""
 
 import numpy as np
 import pandas as pd
@@ -58,11 +24,22 @@ from xgboost import XGBClassifier
 import warnings
 warnings.filterwarnings('ignore')
 
-# Set publication-quality plot style
+
 plt.style.use('seaborn-v0_8-whitegrid')
+
 sns.set_palette("husl")
 
-# Reproducibility
+
+
+plt.rcParams.update({
+    'axes.labelsize': 14,      # X and Y axis labels
+    'axes.titlesize': 14,      # Titles
+    'xtick.labelsize': 14,     # X-axis tick labels
+    'ytick.labelsize': 14,     # Y-axis tick labels
+    'legend.fontsize': 12,     # Legend text
+})
+
+
 np.random.seed(7)
 random.seed(7)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -81,15 +58,14 @@ FINAL_VAL_SIZE = 0.10
 # =====================================================================
 # CLASS WEIGHT CONFIGURATION - CUSTOM WEIGHTS FOR CLASS 0 (NORMAL)
 # =====================================================================
-# NOTE: This weight can be tuned between 1.0-2.5 based on validation performance
-# Higher values (>1.0) improve recall for Normal class at cost of other classes
+
 NORMAL_WEIGHT = 2.0
 
 # =====================================================================
 # SHAP & INTERPRETABILITY CONFIGURATION
 # =====================================================================
 RUN_SHAP_ANALYSIS = True  # Set to False to skip SHAP analysis (faster training)
-INTERPRETABILITY_SAMPLE_SIZE = 1500  # Max samples for interpretability plots
+INTERPRETABILITY_SAMPLE_SIZE = 1000  
 
 # =====================================================================
 # CLASS MAPPING
@@ -109,7 +85,7 @@ CLASS_MAPPING = {
 # LABEL PROCESSING
 # =====================================================================
 def process_labels(y_raw):
-    """Process raw labels to map to consecutive indices for classification."""
+
     unique_in_data = np.unique(y_raw)
     present_classes = [l for l in unique_in_data if l in CLASS_MAPPING]
     if not present_classes:
@@ -151,11 +127,6 @@ def run_shap_analysis(model, X_scaled, y_scaled, feature_names, prefix, n_sample
     """
     Compute SHAP values using modern SHAP API.
 
-    Returns:
-        shap_values: SHAP values (list or 3D array depending on model)
-        X_sample: Sampled features used for SHAP computation
-        y_sample: Corresponding labels for the sampled features
-        sample_indices: Original indices of sampled data
     """
         # ====================== STRATIFIED SAMPLING (MATLAB-style) ======================
     if len(X_scaled) > n_samples:
@@ -177,15 +148,6 @@ def run_shap_analysis(model, X_scaled, y_scaled, feature_names, prefix, n_sample
         X_sample = X_scaled
         y_sample = y_scaled
         sample_indices = np.arange(len(X_scaled))
-
-
-
-
-
-
-
-
-
 
 
 
@@ -270,7 +232,7 @@ def calculate_metrics(y_true, y_pred, prefix):
     }
 
 # =====================================================================
-# CONFERENCE FIGURE PLOTTING FUNCTIONS
+# FIGURE PLOTTING FUNCTIONS
 # =====================================================================
 def plot_confusion_matrix(y_true, y_pred, class_names, title, filename, normalize=False):
     """Plot confusion matrix heatmap for conference paper."""
@@ -283,8 +245,8 @@ def plot_confusion_matrix(y_true, y_pred, class_names, title, filename, normaliz
                 xticklabels=class_names, yticklabels=class_names, ax=ax,
                 cbar_kws={'label': 'Proportion' if normalize else 'Count'},
                 linewidths=0.5, linecolor='gray')
-    ax.set_xlabel('Predicted Label', fontsize=12)
-    ax.set_ylabel('True Label', fontsize=12)
+    ax.set_xlabel('Predicted Label', fontsize=14)
+    ax.set_ylabel('True Label', fontsize=14)
     ax.set_title(title, fontsize=14, fontweight='bold')
     plt.xticks(rotation=45, ha='right')
     plt.yticks(rotation=0)
@@ -318,10 +280,10 @@ def plot_roc_curves(y_true, y_pred_proba, class_names, title, filename):
     ax.plot([0, 1], [0, 1], 'k:', linewidth=1, alpha=0.5)
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('False Positive Rate', fontsize=12)
-    ax.set_ylabel('True Positive Rate', fontsize=12)
+    ax.set_xlabel('False Positive Rate', fontsize=14)
+    ax.set_ylabel('True Positive Rate', fontsize=14)
     ax.set_title(title, fontsize=14, fontweight='bold')
-    ax.legend(loc='lower right', fontsize=10)
+    ax.legend(loc='lower right', fontsize=14)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches='tight')
@@ -354,10 +316,10 @@ def plot_precision_recall_curves(y_true, y_pred_proba, class_names, title, filen
 
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('Recall', fontsize=12)
-    ax.set_ylabel('Precision', fontsize=12)
+    ax.set_xlabel('Recall', fontsize=14)
+    ax.set_ylabel('Precision', fontsize=14)
     ax.set_title(title, fontsize=14, fontweight='bold')
-    ax.legend(loc='upper right', fontsize=10)
+    ax.legend(loc='upper right', fontsize=14)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches='tight')
@@ -381,8 +343,8 @@ def plot_class_distribution(y, class_names, title, filename):
                     xytext=(0, 3), textcoords="offset points",
                     ha='center', va='bottom', fontsize=10)
 
-    ax.set_xlabel('Fault Type', fontsize=12)
-    ax.set_ylabel('Number of Samples', fontsize=12)
+    ax.set_xlabel('Fault Type', fontsize=14)
+    ax.set_ylabel('Number of Samples', fontsize=14)
     ax.set_title(title, fontsize=14, fontweight='bold')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
@@ -402,8 +364,8 @@ def plot_feature_importance(model, feature_names, title, filename, top_n=5):
     bars = ax.barh(importance_df['feature'], importance_df['importance'],
                    color=sns.color_palette("Blues_d", len(importance_df)))
     ax.invert_yaxis()
-    ax.set_xlabel('Feature Importance (Gain)', fontsize=12)
-    ax.set_ylabel('Feature', fontsize=12)
+    ax.set_xlabel('Feature Importance (Gain)', fontsize=14)
+    ax.set_ylabel('Feature', fontsize=14)
     ax.set_title(title, fontsize=14, fontweight='bold')
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches='tight')
@@ -412,7 +374,7 @@ def plot_feature_importance(model, feature_names, title, filename, top_n=5):
     return importance_df
 
 # =====================================================================
-# INTERPRETABILITY PLOTTING FUNCTIONS - FIXED FOR API COMPATIBILITY
+# INTERPRETABILITY PLOTTING FUNCTIONS 
 # =====================================================================
 
 def plot_permutation_importance(model, X, y, feature_names, title, filename, top_n=5, n_repeats=10):
@@ -445,8 +407,8 @@ def plot_permutation_importance(model, X, y, feature_names, title, filename, top
             capsize=3
         )
         ax.invert_yaxis()
-        ax.set_xlabel('Permutation Importance (Mean Decrease in F1)', fontsize=12)
-        ax.set_ylabel('Feature', fontsize=12)
+        ax.set_xlabel('Permutation Importance (Mean Decrease in F1)', fontsize=14)
+        ax.set_ylabel('Feature', fontsize=14)
         ax.set_title(title, fontsize=14, fontweight='bold')
         plt.tight_layout()
         plt.savefig(filename, dpi=300, bbox_inches='tight')
@@ -491,7 +453,7 @@ def plot_partial_dependence(model, X, feature_names, title, filename, class_idx=
                     line_kw={'color': 'blue', 'linewidth': 2}
                 )
                 axes[idx].set_title(f'PDP: {feature_names[feat_idx]} (Class {class_idx})', 
-                                   fontsize=12, fontweight='bold')
+                                   fontsize=14, fontweight='bold')
             except Exception as e:
                 print(f"    Warning: Could not plot PDP for {feature_names[feat_idx]}: {e}")
                 axes[idx].text(0.5, 0.5, f'PDP for {feature_names[feat_idx]}\n unavailable',
@@ -518,7 +480,7 @@ def plot_partial_dependence(model, X, feature_names, title, filename, class_idx=
                     target=class_idx  # FIXED: Added target parameter for multiclass
                 )
                 ax2.set_title(f'2-Way PDP: {feature_names[top_indices[0]]} x {feature_names[top_indices[1]]} (Class {class_idx})',
-                             fontsize=12, fontweight='bold')
+                             fontsize=14, fontweight='bold')
                 plt.tight_layout()
                 plt.savefig(filename.replace('.png', '_interaction.png'), dpi=300, bbox_inches='tight')
                 plt.close()
@@ -532,9 +494,9 @@ def plot_partial_dependence(model, X, feature_names, title, filename, class_idx=
 
 
 def plot_shap_importance(shap_values, X_sample, feature_names, title, filename, class_names, top_n=10):
-    """UPDATED: MATLAB-style stacked bar chart with DISTINCT, clear colors."""
+
     try:
-        print(f" → Creating MATLAB-style STACKED SHAP importance plot with distinct colors...")
+        print(f"  SHAP importance plot ")
 
         # Compute mean absolute SHAP per feature per class
         if isinstance(shap_values, list):
@@ -564,10 +526,10 @@ def plot_shap_importance(shap_values, X_sample, feature_names, title, filename, 
             '#f781bf'   # Pink      - Beam_loss
         ]
 
-        # Use only as many colors as we have classes
+        # Use  many colors as
         colors = distinct_colors[:len(class_names)]
 
-        # === MATLAB-style stacked horizontal bar chart ===
+        # ===  stacked horizontal bar chart ===
         fig, ax = plt.subplots(figsize=(14, max(9, top_n * 0.75)))
 
         left = np.zeros(len(top_features))
@@ -582,13 +544,13 @@ def plot_shap_importance(shap_values, X_sample, feature_names, title, filename, 
             left += top_per_class[:, c]
 
         ax.invert_yaxis()
-        ax.set_xlabel('Mean |SHAP Value| (stacked by class contribution)', fontsize=13)
-        ax.set_ylabel('Feature', fontsize=13)
-        ax.set_title(title + '\n(MATLAB-style: Per-Class Contribution)', 
+        ax.set_xlabel('Mean |SHAP Value| (stacked by class contribution)', fontsize=14)
+        ax.set_ylabel('Feature', fontsize=14)
+        ax.set_title(title + '\n(Per-Class Contribution)', 
                      fontsize=15, fontweight='bold', pad=25)
 
         # Legend with better visibility
-        ax.legend(title='Class', loc='lower right', fontsize=10.5, 
+        ax.legend(title='Class', loc='lower right', fontsize=14, 
                   frameon=True, ncol=2 if len(class_names) > 6 else 1)
 
         plt.tight_layout()
@@ -778,8 +740,8 @@ def plot_local_shap(model, X_sample, feature_names, title, filename, sample_idx=
             color=colors
         )
         ax.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
-        ax.set_xlabel('SHAP Value (Impact on Prediction)', fontsize=12)
-        ax.set_ylabel('Feature', fontsize=12)
+        ax.set_xlabel('SHAP Value (Impact on Prediction)', fontsize=14)
+        ax.set_ylabel('Feature', fontsize=14)
         ax.set_title(f'{title} - {class_name}', fontsize=14, fontweight='bold')
         ax.invert_yaxis()
         plt.tight_layout()
@@ -815,16 +777,10 @@ def plot_local_shap_per_class(shap_values, X_sample, y_sample, feature_names, cl
     """
     Local Shapley Plot PER CLASS - Shows top N features for each class.
 
-    Reuses pre-computed SHAP values instead of recomputing.
-    Properly handles both list format and 3D array (n_samples, n_features, n_classes).
-
     Outputs:
         - fig_local_shap_sample_combined.png (all classes in subplot grid)
         - fig_local_shap_sample_class_{idx}_{ClassName}.png (one per class)
 
-    Color coding:
-        - Green bars: Features that push prediction TOWARD this class
-        - Red bars: Features that push prediction AWAY from this class
     """
     print(f"\n  Generating Local SHAP per class (top {top_n} features)...")
 
@@ -864,8 +820,8 @@ def plot_local_shap_per_class(shap_values, X_sample, y_sample, feature_names, cl
 
             if n_class_samples == 0:
                 ax.text(0.5, 0.5, f'No samples for\n{class_names[class_idx]}',
-                       ha='center', va='center', fontsize=12, transform=ax.transAxes)
-                ax.set_title(f'{class_names[class_idx]}', fontsize=12, fontweight='bold')
+                       ha='center', va='center', fontsize=14, transform=ax.transAxes)
+                ax.set_title(f'{class_names[class_idx]}', fontsize=14, fontweight='bold')
                 continue
 
             class_shap = shap_per_class[class_idx][class_mask]
@@ -885,9 +841,9 @@ def plot_local_shap_per_class(shap_values, X_sample, y_sample, feature_names, cl
             colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(top_features)))
             ax.barh(top_features, top_values, color=colors)
             ax.invert_yaxis()
-            ax.set_xlabel('Mean |SHAP Value|', fontsize=10)
-            ax.set_ylabel('Feature', fontsize=10)
-            ax.set_title(f'{class_names[class_idx]} (n={n_class_samples})', fontsize=11, fontweight='bold')
+            ax.set_xlabel('Mean |SHAP Value|', fontsize=14)
+            ax.set_ylabel('Feature', fontsize=14)
+            ax.set_title(f'{class_names[class_idx]} (n={n_class_samples})', fontsize=14, fontweight='bold')
 
         for idx in range(n_classes, len(axes)):
             axes[idx].set_visible(False)
@@ -912,15 +868,15 @@ def plot_local_shap_per_class(shap_values, X_sample, y_sample, feature_names, cl
             bars = ax.barh(top_features, top_values, color=colors,
                           edgecolor='black', linewidth=0.5)
             ax.invert_yaxis()
-            ax.set_xlabel('Mean |SHAP Value| (Average Impact on Prediction)', fontsize=12)
-            ax.set_ylabel('Feature', fontsize=12)
+            ax.set_xlabel('Mean |SHAP Value| (Average Impact on Prediction)', fontsize=14)
+            ax.set_ylabel('Feature', fontsize=14)
             ax.set_title(f'Local SHAP - {class_names[class_idx]}\n'
                         f'(Top {top_n} Features for Class Prediction, n={n_class_samples})',
                         fontsize=14, fontweight='bold')
 
             for bar, val in zip(bars, top_values):
                 ax.text(bar.get_width() + 0.001, bar.get_y() + bar.get_height()/2,
-                       f'{val:.4f}', va='center', fontsize=10)
+                       f'{val:.4f}', va='center', fontsize=14)
 
             plt.tight_layout()
             class_filename = (f'{filename_prefix}_class_{class_idx}_'
@@ -942,9 +898,8 @@ def save_all_figures(y_cv_true, y_cv_pred, y_cv_proba, y_test_true, y_test_pred,
                      class_names, model, feature_names, y_train, X_train_scaled=None,
                      shap_values=None, X_sample=None, y_sample=None):
     """
-    Save all figures for conference report including all interpretability plots.
+    Save all figures including all interpretability plots.
 
-    IMPROVED v8: Better handling of small sample sizes and API compatibility fixes.
     """
     print(f"\n{'='*70}")
     print(" SAVING CONFERENCE FIGURES")
@@ -1355,7 +1310,7 @@ def train_model(df_mode, y, class_names, save_prefix):
 def main():
     total_start_time = time.time()
     print("=" * 100)
-    print(" UNIFIED FAULT DETECTION TRAINING v8 - API COMPATIBILITY FIXES")
+    print(" UNIFIED FAULT DETECTION TRAINING v8")
     print(f" Config: {N_FOLDS}-Fold CV, {N_OPTUNA_TRIALS} Optuna trials, {EARLY_STOPPING_ROUNDS} early stopping")
     print(f"         Normal Weight: {NORMAL_WEIGHT}, SHAP Analysis: {'Enabled' if RUN_SHAP_ANALYSIS else 'Disabled'}")
     print("=" * 100)
